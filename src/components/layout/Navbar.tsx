@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { currentUser } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import logo from '@/assets/logo.png';
 
 const navItems = [
   { label: 'Discover', path: '/discover' },
@@ -22,11 +23,8 @@ export function Navbar() {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center">
-              <span className="text-white font-bold text-lg">S</span>
-            </div>
-            <span className="font-bold text-xl text-foreground">SwipeHire</span>
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt="SwipeHire" className="h-10" />
           </Link>
 
           {/* Desktop Navigation */}
