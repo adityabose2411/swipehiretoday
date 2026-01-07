@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 const navItems = [
   { label: 'Discover', path: '/discover' },
   { label: 'Matches', path: '/matches' },
+  { label: 'Messages', path: '/messages' },
   { label: 'Meetups', path: '/meetups' },
   { label: 'Profile', path: '/profile' },
 ];
@@ -66,9 +67,11 @@ export function Navbar() {
                 3
               </span>
             </Button>
-            <Button variant="ghost" size="icon">
-              <MessageCircle className="h-5 w-5" />
-            </Button>
+            <Link to="/messages">
+              <Button variant="ghost" size="icon">
+                <MessageCircle className="h-5 w-5" />
+              </Button>
+            </Link>
             <Link to="/profile">
               <Avatar className="h-9 w-9 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
                 <AvatarImage src={user?.user_metadata?.avatar_url} />
