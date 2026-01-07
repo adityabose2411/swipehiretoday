@@ -9,6 +9,7 @@ import Auth from "./pages/Auth";
 import Discover from "./pages/Discover";
 import Matches from "./pages/Matches";
 import Meetups from "./pages/Meetups";
+import Messages from "./pages/Messages";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/discover" element={<Discover />} />
             <Route path="/matches" element={<Matches />} />
+            <Route path="/messages" element={<Messages />} />
             <Route path="/meetups" element={<Meetups />} />
             <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
