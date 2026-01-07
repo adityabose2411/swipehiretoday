@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, User, Bell, MessageCircle } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, Bell, MessageCircle, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { currentUser } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 const navItems = [
   { label: 'Discover', path: '/discover' },
@@ -17,6 +18,18 @@ const navItems = [
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success('Signed out successfully');
+      navigate('/');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign out');
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-border/50">
@@ -58,10 +71,13 @@ export function Navbar() {
             </Button>
             <Link to="/profile">
               <Avatar className="h-9 w-9 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
-                <AvatarImage src={currentUser.profileImage} />
-                <AvatarFallback>{currentUser.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={user?.user_metadata?.avatar_url} />
+                <AvatarFallback>{user?.email?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
               </Avatar>
             </Link>
+            <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out">
+              <LogOut className="h-5 w-5" />
+            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -94,6 +110,17 @@ export function Navbar() {
                   {item.label}
                 </Link>
               ))}
+              <Button
+                variant="ghost"
+                className="justify-start px-4 py-3 text-sm font-medium text-muted-foreground"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleSignOut();
+                }}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </div>
         )}

@@ -44,10 +44,10 @@ export default function Landing() {
             <img src={logo} alt="SwipeHire" className="h-10" />
           </Link>
           <div className="flex items-center gap-4">
-            <Link to="/discover">
+            <Link to="/auth">
               <Button variant="ghost">Login</Button>
             </Link>
-            <Link to="/discover">
+            <Link to="/auth">
               <Button variant="hero">Get Started</Button>
             </Link>
           </div>
@@ -89,7 +89,7 @@ export default function Landing() {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/discover">
+              <Link to="/auth">
                 <Button variant="hero" size="xl">
                   Start Swiping
                   <ArrowRight className="w-5 h-5" />
@@ -238,7 +238,7 @@ export default function Landing() {
                 Join thousands of professionals and companies already building meaningful connections
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link to="/discover">
+                <Link to="/auth">
                   <Button variant="glass" size="xl">
                     Start Free Today
                     <ArrowRight className="w-5 h-5" />
