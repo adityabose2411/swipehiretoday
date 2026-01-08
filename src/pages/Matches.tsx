@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MessageCircle, Calendar, Search, MoreHorizontal } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
@@ -8,10 +9,26 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { mockMatches, mockProfiles } from '@/data/mockData';
 import { cn } from '@/lib/utils';
+import { useConversations } from '@/hooks/useMessages';
+import { toast } from 'sonner';
 
 export default function Matches() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
+  const { createConversation } = useConversations();
+
+  const handleMessageClick = async (e: React.MouseEvent, userId: string) => {
+    e.stopPropagation();
+    const { data, error } = await createConversation(userId);
+    if (error) {
+      toast.error('Failed to create conversation');
+      return;
+    }
+    if (data) {
+      navigate(`/messages?conversation=${data.id}`);
+    }
+  };
 
   // Get matched profiles with their user data
   const matchedProfiles = mockMatches.map(match => {
@@ -116,7 +133,12 @@ export default function Matches() {
 
                     {/* Actions */}
                     <div className="flex items-center gap-2">
-                      <Button variant="ghost" size="icon" className="text-primary">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-primary"
+                        onClick={(e) => handleMessageClick(e, profile!.id)}
+                      >
                         <MessageCircle className="w-5 h-5" />
                       </Button>
                       <Button variant="ghost" size="icon" className="text-success">
