@@ -11,12 +11,22 @@ import { mockMatches, mockProfiles } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 import { useConversations } from '@/hooks/useMessages';
 import { toast } from 'sonner';
+import { ScheduleMeetupDialog } from '@/components/meetups/ScheduleMeetupDialog';
+import { User } from '@/types';
 
 export default function Matches() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
+  const [meetupDialogOpen, setMeetupDialogOpen] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<User | null>(null);
   const { createConversation } = useConversations();
+
+  const handleScheduleMeetup = (e: React.MouseEvent, profile: User) => {
+    e.stopPropagation();
+    setSelectedProfile(profile);
+    setMeetupDialogOpen(true);
+  };
 
   const handleMessageClick = async (e: React.MouseEvent, userId: string) => {
     e.stopPropagation();
@@ -141,7 +151,12 @@ export default function Matches() {
                       >
                         <MessageCircle className="w-5 h-5" />
                       </Button>
-                      <Button variant="ghost" size="icon" className="text-success">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="text-success"
+                        onClick={(e) => handleScheduleMeetup(e, profile!)}
+                      >
                         <Calendar className="w-5 h-5" />
                       </Button>
                       <Button variant="ghost" size="icon">
@@ -171,6 +186,15 @@ export default function Matches() {
           </div>
         </div>
       </div>
+
+      {selectedProfile && (
+        <ScheduleMeetupDialog
+          open={meetupDialogOpen}
+          onOpenChange={setMeetupDialogOpen}
+          profileName={selectedProfile.name}
+          profileId={selectedProfile.id}
+        />
+      )}
     </Layout>
   );
 }
