@@ -5,25 +5,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useMessages } from '@/hooks/useMessages';
-import { useAuth } from '@/contexts/AuthContext';
-import { mockProfiles } from '@/data/mockData';
-import { User } from '@/types';
+import { useMessages, Conversation } from '@/hooks/useMessages';
 
 interface ChatViewProps {
   conversationId: string;
-  otherUserId?: string;
+  conversation: Conversation;
   onBack?: () => void;
 }
 
-export function ChatView({ conversationId, otherUserId, onBack }: ChatViewProps) {
-  const { user } = useAuth();
+export function ChatView({ conversationId, conversation, onBack }: ChatViewProps) {
   const { messages, loading, sendMessage } = useMessages(conversationId);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const otherUser = mockProfiles.find(p => p.user.id === otherUserId)?.user;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -33,7 +27,7 @@ export function ChatView({ conversationId, otherUserId, onBack }: ChatViewProps)
     if (!newMessage.trim() || sending) return;
 
     setSending(true);
-    await sendMessage(newMessage.trim());
+    sendMessage(newMessage.trim());
     setNewMessage('');
     setSending(false);
   };
@@ -63,12 +57,12 @@ export function ChatView({ conversationId, otherUserId, onBack }: ChatViewProps)
           </Button>
         )}
         <Avatar className="w-10 h-10">
-          <AvatarImage src={otherUser?.profileImage} />
-          <AvatarFallback>{otherUser?.name?.charAt(0) || '?'}</AvatarFallback>
+          <AvatarImage src={conversation.participant.avatar} />
+          <AvatarFallback>{conversation.participant.name.charAt(0)}</AvatarFallback>
         </Avatar>
         <div>
-          <h3 className="font-semibold">{otherUser?.name || 'Unknown User'}</h3>
-          <p className="text-xs text-muted-foreground">{otherUser?.title}</p>
+          <h3 className="font-semibold">{conversation.participant.name}</h3>
+          <p className="text-xs text-muted-foreground">{conversation.participant.role}</p>
         </div>
       </div>
 
@@ -80,7 +74,7 @@ export function ChatView({ conversationId, otherUserId, onBack }: ChatViewProps)
           </div>
         ) : (
           messages.map((message, index) => {
-            const isOwn = message.sender_id === user?.id;
+            const isOwn = message.sender_id === 'me';
             return (
               <motion.div
                 key={message.id}
@@ -92,21 +86,29 @@ export function ChatView({ conversationId, otherUserId, onBack }: ChatViewProps)
                   isOwn ? "justify-end" : "justify-start"
                 )}
               >
-                <div
-                  className={cn(
-                    "max-w-[75%] rounded-2xl px-4 py-2",
-                    isOwn
-                      ? "bg-primary text-primary-foreground rounded-br-md"
-                      : "bg-muted text-foreground rounded-bl-md"
+                <div className={cn("flex items-end gap-2 max-w-[75%]", isOwn && "flex-row-reverse")}>
+                  {!isOwn && (
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={conversation.participant.avatar} />
+                      <AvatarFallback>{conversation.participant.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
                   )}
-                >
-                  <p className="text-sm">{message.content}</p>
-                  <p className={cn(
-                    "text-xs mt-1",
-                    isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
-                  )}>
-                    {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </p>
+                  <div
+                    className={cn(
+                      "rounded-2xl px-4 py-2",
+                      isOwn
+                        ? "bg-primary text-primary-foreground rounded-br-md"
+                        : "bg-muted text-foreground rounded-bl-md"
+                    )}
+                  >
+                    <p className="text-sm">{message.content}</p>
+                    <p className={cn(
+                      "text-xs mt-1",
+                      isOwn ? "text-primary-foreground/70" : "text-muted-foreground"
+                    )}>
+                      {new Date(message.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             );

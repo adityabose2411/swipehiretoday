@@ -3,8 +3,6 @@ import { MessageCircle } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import { Conversation } from '@/hooks/useMessages';
-import { mockProfiles } from '@/data/mockData';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface ConversationListProps {
   conversations: Conversation[];
@@ -13,8 +11,6 @@ interface ConversationListProps {
 }
 
 export function ConversationList({ conversations, selectedId, onSelect }: ConversationListProps) {
-  const { user } = useAuth();
-
   if (conversations.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center p-6">
@@ -29,49 +25,73 @@ export function ConversationList({ conversations, selectedId, onSelect }: Conver
     );
   }
 
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffDays === 1) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-border">
-        <h2 className="font-semibold text-lg">Messages</h2>
+        <h2 className="font-semibold text-lg flex items-center gap-2">
+          <MessageCircle className="w-5 h-5 text-primary" />
+          Messages
+        </h2>
       </div>
       <div className="flex-1 overflow-y-auto">
-        {conversations.map((conversation, index) => {
-          // Get the other participant
-          const otherUserId = conversation.participants.find(p => p !== user?.id);
-          const otherUser = mockProfiles.find(p => p.user.id === otherUserId)?.user;
-          
-          return (
-            <motion.button
-              key={conversation.id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.05 }}
-              onClick={() => onSelect(conversation.id)}
-              className={cn(
-                "w-full flex items-center gap-3 p-4 hover:bg-accent/50 transition-colors text-left border-b border-border/50",
-                selectedId === conversation.id && "bg-accent"
-              )}
-            >
+        {conversations.map((conversation, index) => (
+          <motion.button
+            key={conversation.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: index * 0.05 }}
+            onClick={() => onSelect(conversation.id)}
+            className={cn(
+              "w-full flex items-center gap-3 p-4 hover:bg-accent/50 transition-colors text-left border-b border-border/50",
+              selectedId === conversation.id && "bg-accent"
+            )}
+          >
+            <div className="relative">
               <Avatar className="w-12 h-12">
-                <AvatarImage src={otherUser?.profileImage} />
-                <AvatarFallback>{otherUser?.name?.charAt(0) || '?'}</AvatarFallback>
+                <AvatarImage src={conversation.participant.avatar} />
+                <AvatarFallback>{conversation.participant.name.charAt(0)}</AvatarFallback>
               </Avatar>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium truncate">{otherUser?.name || 'Unknown User'}</span>
-                  {conversation.lastMessage && (
-                    <span className="text-xs text-muted-foreground">
-                      {new Date(conversation.lastMessage.created_at).toLocaleDateString()}
-                    </span>
-                  )}
-                </div>
-                <p className="text-sm text-muted-foreground truncate">
-                  {conversation.lastMessage?.content || 'No messages yet'}
-                </p>
+              {conversation.unread && (
+                <span className="absolute -top-1 -right-1 h-3 w-3 bg-primary rounded-full border-2 border-background" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between mb-1">
+                <span className={cn("font-medium truncate", conversation.unread && "text-foreground")}>
+                  {conversation.participant.name}
+                </span>
+                {conversation.lastMessage && (
+                  <span className="text-xs text-muted-foreground ml-2">
+                    {formatTime(conversation.lastMessage.created_at)}
+                  </span>
+                )}
               </div>
-            </motion.button>
-          );
-        })}
+              <p className="text-xs text-muted-foreground truncate mb-1">
+                {conversation.participant.role}
+              </p>
+              <p className={cn(
+                "text-sm truncate",
+                conversation.unread ? "font-medium text-foreground" : "text-muted-foreground"
+              )}>
+                {conversation.lastMessage?.content || 'No messages yet'}
+              </p>
+            </div>
+          </motion.button>
+        ))}
       </div>
     </div>
   );

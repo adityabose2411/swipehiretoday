@@ -1,19 +1,17 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { MessageCircle } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { ConversationList } from '@/components/messages/ConversationList';
 import { ChatView } from '@/components/messages/ChatView';
 import { useConversations } from '@/hooks/useMessages';
-import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 
 export default function Messages() {
-  const { user } = useAuth();
   const { conversations, loading } = useConversations();
   const [selectedConversationId, setSelectedConversationId] = useState<string | null>(null);
 
   const selectedConversation = conversations.find(c => c.id === selectedConversationId);
-  const otherUserId = selectedConversation?.participants.find(p => p !== user?.id);
 
   if (loading) {
     return (
@@ -32,7 +30,7 @@ export default function Messages() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex h-full bg-card rounded-none md:rounded-xl md:m-4 md:h-[calc(100%-2rem)] shadow-lg overflow-hidden"
+            className="flex h-full bg-card rounded-none md:rounded-xl md:m-4 md:h-[calc(100%-2rem)] shadow-lg overflow-hidden border border-border/50"
           >
             {/* Conversation List */}
             <div className={cn(
@@ -51,15 +49,16 @@ export default function Messages() {
               "flex-1",
               !selectedConversationId && "hidden md:flex"
             )}>
-              {selectedConversationId ? (
+              {selectedConversation ? (
                 <ChatView
-                  conversationId={selectedConversationId}
-                  otherUserId={otherUserId}
+                  conversationId={selectedConversationId!}
+                  conversation={selectedConversation}
                   onBack={() => setSelectedConversationId(null)}
                 />
               ) : (
                 <div className="flex items-center justify-center h-full text-center p-6">
                   <div>
+                    <MessageCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground/30" />
                     <h3 className="font-semibold text-lg mb-2">Select a conversation</h3>
                     <p className="text-muted-foreground">
                       Choose a conversation to start messaging
