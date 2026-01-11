@@ -5,8 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import logo from '@/assets/logo.png';
-import { useAuth } from '@/contexts/AuthContext';
-import { toast } from 'sonner';
 
 const navItems = [
   { label: 'Discover', path: '/discover' },
@@ -20,16 +18,9 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, signOut } = useAuth();
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      toast.success('Signed out successfully');
-      navigate('/');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to sign out');
-    }
+  const handleSignOut = () => {
+    navigate('/');
   };
 
   return (
@@ -74,8 +65,8 @@ export function Navbar() {
             </Link>
             <Link to="/profile">
               <Avatar className="h-9 w-9 ring-2 ring-primary/20 transition-all hover:ring-primary/40">
-                <AvatarImage src={user?.user_metadata?.avatar_url} />
-                <AvatarFallback>{user?.email?.charAt(0).toUpperCase() || 'U'}</AvatarFallback>
+                <AvatarImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" />
+                <AvatarFallback>U</AvatarFallback>
               </Avatar>
             </Link>
             <Button variant="ghost" size="icon" onClick={handleSignOut} title="Sign out">
