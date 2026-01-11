@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { AssistantCharts } from './AssistantCharts';
+import { ExportPDFButton } from './ExportPDFButton';
 import { toast } from 'sonner';
 
 interface Message {
@@ -33,6 +34,7 @@ export function HiringAssistant() {
   const [isLoading, setIsLoading] = useState(false);
   const [charts, setCharts] = useState<ChartData[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const chartsContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -192,14 +194,21 @@ export function HiringAssistant() {
                     <p className="text-xs opacity-80">AI-powered talent insights</p>
                   </div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsOpen(false)}
-                  className="text-primary-foreground hover:bg-primary-foreground/20"
-                >
-                  <X className="w-5 h-5" />
-                </Button>
+                <div className="flex items-center gap-1">
+                  <ExportPDFButton 
+                    messages={messages} 
+                    charts={charts} 
+                    chartsContainerRef={chartsContainerRef} 
+                  />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setIsOpen(false)}
+                    className="text-primary-foreground hover:bg-primary-foreground/20"
+                  >
+                    <X className="w-5 h-5" />
+                  </Button>
+                </div>
               </div>
             </div>
 
@@ -264,7 +273,7 @@ export function HiringAssistant() {
 
               {/* Charts */}
               {charts.length > 0 && (
-                <div className="mt-4">
+                <div className="mt-4" ref={chartsContainerRef}>
                   <AssistantCharts charts={charts} />
                 </div>
               )}
